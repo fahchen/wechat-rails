@@ -7,9 +7,9 @@ class Wechat::Api
   API_BASE = "https://api.weixin.qq.com/cgi-bin/"
   FILE_BASE = "http://file.api.weixin.qq.com/cgi-bin/"
 
-  def initialize appid, secret, token_file
+  def initialize appid, secret, token_storage
     @client = Wechat::Client.new(API_BASE)
-    @access_token = Wechat::AccessToken.new(@client, appid, secret, token_file)
+    @access_token = Wechat::AccessToken.new(@client, appid, secret, token_storage)
   end
 
   def users

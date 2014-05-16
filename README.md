@@ -270,4 +270,23 @@ Wechat-rails 的核心是一个Message DSL,帮助开发者构建各种类型的�
 
   
 
+Support access_storage
+```ruby
+class TokenStorage
 
+  # required method
+  def get_token
+    # do something
+  end
+
+  # required method
+  def update_token token
+    # do something
+  end
+
+end
+
+token_storage  = TokenStorage.new token: '12345'
+
+wechat = Wechat::Api.new('appid', 'appsecret', token_storage)
+```
