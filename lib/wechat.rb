@@ -1,26 +1,15 @@
-#!/usr/bin/env ruby
-
-lib = File.expand_path(File.dirname(__FILE__) + '/../lib')
-$LOAD_PATH.unshift(lib) if File.directory?(lib) && !$LOAD_PATH.include?(lib)
-
 require 'thor'
-require "wechat-rails"
 require 'json'  
 require "active_support/core_ext"
 require 'fileutils'
-require 'yaml'
-
+require_relative "wechat-rails"
 
 class App < Thor                                                 
   class Helper
     def self.with(options)
-      config_file = File.join(Dir.home, ".wechat.yml")
-      config = YAML.load(File.new(config_file).read) if File.exist?(config_file)
-
-      config ||= {}
-      appid =  config["appid"]
-      secret = config["secret"]
-      token_file = options[:toke_file] ||  config["access_token"] || "/var/tmp/wechat_access_token"
+      appid =  Wechat.config.appid
+      secret = Wechat.config.secret
+      token_file = options[:toke_file] || Wechat.config.access_token
 
       if (appid.nil? || secret.nil? || token_file.nil?)
       puts <<-HELP
@@ -28,7 +17,7 @@ You need create ~/.wechat.yml with wechat appid and secret. For example:
 
   appid: <wechat appid>
   secret: <wechat secret>
-  access_toke: "/var/tmp/wechat_access_token"
+  access_token: "/var/tmp/wechat_access_token"
 
 HELP
       exit 1
@@ -133,12 +122,4 @@ HELP
     puts Helper.with(options).custom_message_send Wechat::Message.to(openid).news(articles["articles"])
   end
 
-  desc "template_message [OPENID, TEMPLATE_YAML_FILE]", "模板消息接口"
-  def template_message openid, template_yaml
-    template = YAML.load(File.new(template_yaml).read)
-    puts Helper.with(options).template_message_send Wechat::Message.to(openid).template(template["template"])    
-  end
-
 end
-
-App.start
